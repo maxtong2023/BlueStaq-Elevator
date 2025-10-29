@@ -1,11 +1,16 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
+
 
 public class elevator {
     private int currentFloor; 
     private int highestFloor; 
     private int lowestFloor; 
     private int maxElevatorWeight; 
+
+    private List<Integer> upList;
+    private List<Integer> downList;
     private List<Integer> floorQueue;
     private enum Direction {
         UP,
@@ -36,33 +41,73 @@ public class elevator {
 
     // nah its not a priority queue. That doesn't make sense. reversing directions would make the priority
     // flip, which is a pain. I think it would be better to keep it simple and use a list.
+    
 
+    // hang on what if i use TWO lists?! one for up and one for down. Let's think about this case: 
+    // the elevator is already on floor 2 or something and is going down and there is a person on floor 5 wanting to go down.
+    // this should queue the person on floor 5 but it shouldn't execute until after the elevator up cycle happens.
+    // hmm.
+    // This is actually harder than I thought. What if I use 4 lists?
+    // an up list going up, a down list going down, an up list going down, and a down list going up?
 
 
     public void setFloor(int floor) {
 
     }
 
+    public void openDoor(){
+        System.out.println("Door opened at floor " + currentFloor);
+    }
+
     public int getFloor(){
         return currentFloor;
     }
 
-    public void requestFloor(int start, int destination){
+    public void requestFloor(int destination){
         if(destination > highestFloor || destination < lowestFloor){
             throw new IllegalArgumentException("Pick a valid destination");
 
         }
-        if(start > highestFloor || start < lowestFloor){
-            throw new IllegalArgumentException("Pick a valid start");
+        if(destination == currentFloor){
+            throw new IllegalArgumentException("You'realready on that floor");
         }
-        if(start == destination){
-            throw new IllegalArgumentException("Start and destination floors are the same");
+
+        if(destination > currentFloor){
+            upList.add(destination);
         }
-        floorQueue.add(destination);
+        else{
+            downList.add(destination);
+        }
+
+        
         setDirection();
         
 
        
+    }
+
+    public void requestElevator(int start, Direction direction){
+        if(start > highestFloor || start < lowestFloor){
+            throw new IllegalArgumentException("Pick a valid start");
+        }
+        if(direction == Direction.UP){
+            upList.add(start);
+        }
+        else if( direction == Direction.DOWN){
+            downList.add(start);
+        }
+        else{ // case in which there are no requests.
+            if(currentFloor > start){
+                downList.add(start);
+                direction = Direction.DOWN;
+            }
+            else{
+                upList.add(start);
+                direction = Direction.UP;
+            }
+        }
+
+        
     }
 
     public void setDirection(){
