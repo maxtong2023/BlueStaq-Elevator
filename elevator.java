@@ -9,11 +9,9 @@ public class elevator {
     private int currentFloor; 
     private int highestFloor; 
     private int lowestFloor; 
-    private int maxElevatorWeight; 
 
     private List<Integer> upList;
     private List<Integer> downList;
-    private List<Integer> floorQueue;
     private enum Direction {
         UP,
         DOWN,
@@ -23,11 +21,10 @@ public class elevator {
     
 
 
-    public elevator(int currentFloor, int highestFloor, int lowestFloor, int maxElevatorWeight) {
+    public elevator(int currentFloor, int highestFloor, int lowestFloor) {
         this.currentFloor = currentFloor;
         this.highestFloor = highestFloor;
         this.lowestFloor = lowestFloor;
-        this.maxElevatorWeight = maxElevatorWeight;
         this.upList = new ArrayList<>();
         this.downList = new ArrayList<>();
         this.direction = Direction.IDLE;
@@ -79,6 +76,10 @@ public class elevator {
         if(destination == currentFloor){
             throw new IllegalArgumentException("You're already on that floor");
         }
+        if (upList.contains(destination) || downList.contains(destination)) {
+            System.out.println("Duplicate floor request");
+            return;
+        }
 
         if(destination > currentFloor){
             if(downList.isEmpty()){
@@ -96,64 +97,90 @@ public class elevator {
             Collections.reverse(downList);
         }
 
+        if (direction == Direction.IDLE) {
+            if (!upList.isEmpty()){
+                direction = Direction.UP;
+            }
+            else if (!downList.isEmpty()){
+                direction = Direction.DOWN;
+            }
+        }
+
         
        
     }
 
 
-public void move(){
-    if(upList.isEmpty() && downList.isEmpty()){
-        direction = Direction.IDLE;
-        return;
-    }
-    if(direction == Direction.UP){
-        currentFloor++;
-        if(currentFloor > highestFloor || upList.isEmpty()){
-            direction = Direction.DOWN;
+    public void move(){
+        if(upList.isEmpty() && downList.isEmpty()){
+            direction = Direction.IDLE;
             return;
         }
-        if(currentFloor == upList.get(0)){
-            openDoor();
-            upList.remove(0);
+        
+        if(direction == Direction.UP){
+            if(upList.isEmpty()){
+                direction = Direction.DOWN;
+                return;
+            }
+            currentFloor++;
+            if(!upList.isEmpty() && currentFloor == upList.get(0)){
+                openDoor();
+                upList.remove(0);
+            }
+            if(upList.isEmpty() && !downList.isEmpty()){
+                direction = Direction.DOWN;
+            }
+        }
+        else if(direction == Direction.DOWN){
+            if(downList.isEmpty()){
+                direction = Direction.UP;
+                return;
+            }
+            currentFloor--;
+            if(!downList.isEmpty() && currentFloor == downList.get(0)){
+                openDoor();
+                downList.remove(0);
+            }
+            if(downList.isEmpty() && !upList.isEmpty()){
+                direction = Direction.UP;
+            }
         }
     }
-    else if(direction == Direction.DOWN){
-        currentFloor--;
-        if(currentFloor < lowestFloor || downList.isEmpty()){
-            direction = Direction.UP;
-            return;
-        }
-        if(currentFloor == downList.get(0)){
-            openDoor();
-            downList.remove(0);
-        }
-    }
-    else{
-        return;
-    }
-    
-
-    //downlist should be reverse order.
-    
-}
 
 
 
 public static void main(String[] args) {
-    elevator Elevator = new elevator(0, 10, 0, 1000);
-    //main control loop
+    elevator Elevator = new elevator(0, 10, 0);
     Scanner scanner = new Scanner(System.in);
-    while(true){
-        Elevator.move();
-        System.out.println("Current floor: " + Elevator.getFloor());
-        System.out.println("Enter a floor request (0-10), enter nothing to skip:");
+
+    while(true){ // give some initial data
+        System.out.println("Enter a floor request (0-10), enter nothing to skip, enter 'q' to quit:");
         String input = scanner.nextLine();
         if(input.isEmpty()){
             continue;
         }
+        if(input.equals("q")){
+            break;
+        }
         int floor = Integer.parseInt(input);
         Elevator.requestFloor(floor);
     }
+    while(true){
+        Elevator.move();
+        System.out.println("Current floor: " + Elevator.getFloor());
+        System.out.println("Enter a floor request (0-10), enter nothing to skip, enter 'q' to quit:");
+        String input = scanner.nextLine();
+        if(input.isEmpty()){
+            continue;
+        }
+        if(input.equals("q")){
+            break;
+        }
+        int floor = Integer.parseInt(input);
+        Elevator.requestFloor(floor);
+    }
+
+    scanner.close();
 
 }
 
