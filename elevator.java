@@ -56,10 +56,6 @@ public class elevator {
     // doesn't need to know if we are going to a person or dropping someone off, only the integer for the floor.
 
 
-    public void setFloor(int floor) {
-
-    }
-
     public void openDoor(){
         System.out.println("Door opened at floor " + currentFloor);
     }
