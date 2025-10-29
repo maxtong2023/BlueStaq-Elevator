@@ -50,6 +50,8 @@ public class elevator {
     // hmm.
     // This is actually harder than I thought. What if I use 4 lists?
     // an up list going up, a down list going down, an up list going down, and a down list going up?
+    // no, that's OD. stick with two lists, assume the elevator ignores whether or not the user wants to go down or up.
+    //users still wait the same amount of time regardless of whether or not they are inside or outside of the elevator.
 
 
     // commit 5 has two functions requestfloor and requestelevator. Can these be combined? The elevator
@@ -182,6 +184,16 @@ public static void main(String[] args) {
 
 }
 
+// Imrovements I can make to this model: 
+// Right now for simplicity, the elevator ignores whether or not we are dropping off a user or picking 
+//someone up. It just takes in a floor request and adds that to whatever queue it needs to go accordingly.
+// Future improvements can add this feature, it would make elevator behavior more realistic.
+
+// This algoirithm is pretty simple, all it does it move and pick up all the users it finds on the way in 
+// the direction it is going, and switch once it reaches the top or bottom element. Surely there is a more 
+// efficient algorithm, i don't know, maybe with a priority queue and heuristic calculation?
+
+// I'm assuming that the elevator has 10 floors here, but it could be any number.
 
 
 
