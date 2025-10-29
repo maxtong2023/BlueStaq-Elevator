@@ -26,8 +26,10 @@ public class elevator {
         this.highestFloor = highestFloor;
         this.lowestFloor = lowestFloor;
         this.maxElevatorWeight = maxElevatorWeight;
-        this.floorQueue = new ArrayList<>();
+        this.upList = new ArrayList<>();
+        this.downList = new ArrayList<>();
         this.direction = Direction.IDLE;
+
     }
 
     // So I never thought about how an elevator actually works, but I think it works something like a queue. 
@@ -74,9 +76,12 @@ public class elevator {
 
         if(destination > currentFloor){
             upList.add(destination);
+            Collections.sort(upList);
         }
         else{
             downList.add(destination);
+            Collections.sort(downList);
+            Collections.reverse(downList);
         }
 
         
@@ -92,9 +97,12 @@ public class elevator {
         }
         if(direction == Direction.UP){
             upList.add(start);
+            Collections.sort(upList);
         }
         else if( direction == Direction.DOWN){
             downList.add(start);
+            Collections.sort(downList);
+            Collections.reverse(downList);
         }
         else{ // case in which there are no requests.
             if(currentFloor > start){
@@ -127,15 +135,53 @@ public class elevator {
 
 public void move(){
     if(direction == Direction.UP){
-}   
+        currentFloor++;
+        if(currentFloor > highestFloor || upList.isEmpty()){
+            direction = Direction.DOWN;
+            return;
+        }
+        if(currentFloor == upList.get(0)){
+            openDoor();
+            upList.remove(0);
+        }
+    }
+    else if(direction == Direction.DOWN){
+        currentFloor--;
+        if(currentFloor < lowestFloor || downList.isEmpty()){
+            direction = Direction.UP;
+            return;
+        }
+        if(currentFloor == downList.get(0)){
+            openDoor();
+            downList.remove(0);
+        }
+    }
+    else{
+        return;
+    }
+    
 
-
-
-
-}}
+    //downlist should be reverse order.
+    
+}
 
 
 
 public static void main(String[] args) {
-    System.out.println("Hello, World!");
+    elevator Elevator = new elevator(0, 10, 0, 1000);
+    //main control loop
+    while(true){
+        Elevator.move();
+
+    }
+
 }
+
+}
+
+
+
+
+
+
+
