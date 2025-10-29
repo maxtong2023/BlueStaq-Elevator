@@ -1,6 +1,8 @@
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Scanner;
+
 
 
 public class elevator {
@@ -53,6 +55,10 @@ public class elevator {
     // an up list going up, a down list going down, an up list going down, and a down list going up?
 
 
+    // commit 5 has two functions requestfloor and requestelevator. Can these be combined? The elevator
+    // doesn't need to know if we are going to a person or dropping someone off, only the integer for the floor.
+
+
     public void setFloor(int floor) {
 
     }
@@ -71,69 +77,35 @@ public class elevator {
 
         }
         if(destination == currentFloor){
-            throw new IllegalArgumentException("You'realready on that floor");
+            throw new IllegalArgumentException("You're already on that floor");
         }
 
         if(destination > currentFloor){
+            if(downList.isEmpty()){
+                direction = Direction.UP;
+            }
             upList.add(destination);
             Collections.sort(upList);
         }
         else{
+            if(upList.isEmpty()){
+                direction = Direction.DOWN;
+            }
             downList.add(destination);
             Collections.sort(downList);
             Collections.reverse(downList);
         }
 
         
-        setDirection();
-        
-
        
     }
 
-    public void requestElevator(int start, Direction direction){
-        if(start > highestFloor || start < lowestFloor){
-            throw new IllegalArgumentException("Pick a valid start");
-        }
-        if(direction == Direction.UP){
-            upList.add(start);
-            Collections.sort(upList);
-        }
-        else if( direction == Direction.DOWN){
-            downList.add(start);
-            Collections.sort(downList);
-            Collections.reverse(downList);
-        }
-        else{ // case in which there are no requests.
-            if(currentFloor > start){
-                downList.add(start);
-                direction = Direction.DOWN;
-            }
-            else{
-                upList.add(start);
-                direction = Direction.UP;
-            }
-        }
-
-        
-    }
-
-    public void setDirection(){
-        if(floorQueue.isEmpty()){
-            direction = Direction.IDLE;
-        }
-        if(floorQueue.get(0) > currentFloor && direction == Direction.IDLE){
-            direction = Direction.UP;
-        }
-        if(floorQueue.get(0) < currentFloor && direction == Direction.IDLE){
-            direction = Direction.DOWN;
-        }
-
-
-
-}
 
 public void move(){
+    if(upList.isEmpty() && downList.isEmpty()){
+        direction = Direction.IDLE;
+        return;
+    }
     if(direction == Direction.UP){
         currentFloor++;
         if(currentFloor > highestFloor || upList.isEmpty()){
@@ -170,9 +142,17 @@ public void move(){
 public static void main(String[] args) {
     elevator Elevator = new elevator(0, 10, 0, 1000);
     //main control loop
+    Scanner scanner = new Scanner(System.in);
     while(true){
         Elevator.move();
-
+        System.out.println("Current floor: " + Elevator.getFloor());
+        System.out.println("Enter a floor request (0-10), enter nothing to skip:");
+        String input = scanner.nextLine();
+        if(input.isEmpty()){
+            continue;
+        }
+        int floor = Integer.parseInt(input);
+        Elevator.requestFloor(floor);
     }
 
 }
